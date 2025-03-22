@@ -1,9 +1,11 @@
-# Terraform files to ignore
+# Ignore Terraform state and config files
 .terraform/
 *.tfstate
 *.tfstate.*
 *.tfvars
+
+# Ignore logs and temp files
 crash.log
 *.log
-terraform.tfvars
+*.tmp
 *.zip
