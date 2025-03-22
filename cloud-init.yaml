@@ -8,6 +8,9 @@ packages:
   - firefox
   - vlc
   - ristretto # Lightweight image viewer
+  - fuse
+  - curl
+  - unzip
 
 runcmd:
   - systemctl enable xrdp
@@ -16,3 +19,18 @@ runcmd:
   - usermod -aG sudo rcloneoffsiteadmin
   - echo "startxfce4" > /home/rcloneoffsiteadmin/.xsession
   - chown rcloneoffsiteadmin:rcloneoffsiteadmin /home/rcloneoffsiteadmin/.xsession
+
+  # Install rclone
+  - curl https://rclone.org/install.sh | bash
+
+  # Inject base64 rclone.conf
+  - mkdir -p /home/rcloneoffsiteadmin/.config/rclone
+  - echo "W2IyXQp0eXBlID0gYjIKYWNjb3VudCA9IDAwMTBmOGVhMWNkMTU5YjAwMDAwMDAwMDUKa2V5ID0gSzAwMUNCMHc5SDBRYTFCTlBSOG4wUmJJRUF2YjEyRQoKW2IyLWNyeXB0XQp0eXBlID0gY3J5cHQKcmVtb3RlID0gYjI6MjAyNS11bnJhaWQtcmNsb25lL2VuY3J5cHRlZApwYXNzd29yZCA9IFNOTUhpclVGVGhtU3l6ZXNJUHVjZklaZ0U4aHpkZzhKWjNvV1NvWVo1RW5YZTlCNwoK" | base64 -d > /home/rcloneoffsiteadmin/.config/rclone.conf
+  - chown -R rcloneoffsiteadmin:rcloneoffsiteadmin /home/rcloneoffsiteadmin/.config
+  
+  # Create mount point
+  - mkdir -p /mnt/rclone
+  - chown rcloneoffsiteadmin:rcloneoffsiteadmin /mnt/rclone
+
+  # Auto-mount encrypted remote (change 'b2-crypt:' to your remote name)
+  - echo "@reboot rclone mount b2-crypt: /mnt/rclone --daemon --allow-other --vfs-cache-mode full" >> /var/spool/cron/crontabs/rcloneoffsiteadmin
