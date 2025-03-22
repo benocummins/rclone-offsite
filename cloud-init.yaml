@@ -1,0 +1,18 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+packages:
+  - xfce4
+  - xfce4-goodies
+  - xrdp
+  - firefox
+  - vlc
+  - ristretto # Lightweight image viewer
+
+runcmd:
+  - systemctl enable xrdp
+  - adduser rcloneoffsiteadmin --disabled-password --gecos ""
+  - echo "rcloneoffsiteadmin:Jaycehaleylilly3!" | chpasswd
+  - usermod -aG sudo rcloneoffsiteadmin
+  - echo "startxfce4" > /home/rcloneoffsiteadmin/.xsession
+  - chown rcloneoffsiteadmin:rcloneoffsiteadmin /home/rcloneoffsiteadmin/.xsession
