@@ -1,58 +1,10 @@
 #cloud-config
 package_update: true
-package_upgrade: true
 packages:
-  - xfce4
-  - xfce4-goodies
-  - xrdp
-  - xorgxrdp
-  - firefox
-  - vlc
-  - ristretto
-  - fuse
-  - curl
-  - unzip
+  - git
+  - ansible
 
 runcmd:
-  - echo "Setting up user and desktop session..." >> /var/log/cloud-init-debug.log
-
-  # Create user and desktop session
-  - adduser rcloneoffsiteadmin --disabled-password --gecos "" || true
-  - echo "rcloneoffsiteadmin:Jaycehaleylilly3!" | chpasswd
-  - usermod -aG sudo rcloneoffsiteadmin
-  - echo "startxfce4" > /home/rcloneoffsiteadmin/.xsession
-  - chown rcloneoffsiteadmin:rcloneoffsiteadmin /home/rcloneoffsiteadmin/.xsession
-
-  # Fix startwm.sh for xrdp
-  - sed -i 's/^test -x/#test -x/' /etc/xrdp/startwm.sh
-  - sed -i 's/^exec/#exec/' /etc/xrdp/startwm.sh
-  - echo "startxfce4" >> /etc/xrdp/startwm.sh
-
-  # Start RDP service after it's installed
-  - systemctl enable xrdp
-  - systemctl start xrdp
-
-  # Install rclone
-  - echo "Installing rclone..." >> /var/log/cloud-init-debug.log
-  - curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
-  - unzip rclone-current-linux-amd64.zip
-  - cd rclone-*-linux-amd64
-  - cp rclone /usr/bin/
-  - chown root:root /usr/bin/rclone
-  - chmod 755 /usr/bin/rclone
-  - cd ..
-
-
-  # Add rclone config
-  - mkdir -p /home/rcloneoffsiteadmin/.config/rclone
-  - echo "W2IyXQp0eXBlID0gYjIKYWNjb3VudCA9IDAwMTBmOGVhMWNkMTU5YjAwMDAwMDAwMDUKa2V5ID0gSzAwMUNCMHc5SDBRYTFCTlBSOG4wUmJJRUF2YjEyRQoKW2IyLWNyeXB0XQp0eXBlID0gY3J5cHQKcmVtb3RlID0gYjI6MjAyNS11bnJhaWQtcmNsb25lL2VuY3J5cHRlZApwYXNzd29yZCA9IFNOTUhpclVGVGhtU3l6ZXNJUHVjZklaZ0U4aHpkZzhKWjNvV1NvWVo1RW5YZTlCNwoK" | base64 -d > /home/rcloneoffsiteadmin/.config/rclone/rclone.conf
-  - chown -R rcloneoffsiteadmin:rcloneoffsiteadmin /home/rcloneoffsiteadmin/.config
-
-  # Mount point
-  - mkdir -p /mnt/rclone
-  - chown rcloneoffsiteadmin:rcloneoffsiteadmin /mnt/rclone
-
-  # Auto-mount rclone on reboot
-  - echo "@reboot rclone mount b2-crypt: /mnt/rclone --daemon --allow-other --vfs-cache-mode full" >> /var/spool/cron/crontabs/rcloneoffsiteadmin
-
-final_message: "🔥 VM setup done. Rclone mounted. GUI ready. RDP waiting, boss."
+  - git clone https://github.com/benocummins/rclone-offsite-ansible.git /opt/ansible-project
+  - cd /opt/ansible-project
+  - ansible-playbook -i inventory/hosts.ini playbooks/setup.yml
