@@ -7,4 +7,4 @@ packages:
 runcmd:
   - git clone https://github.com/benocummins/rclone-offsite-ansible.git /opt/ansible-project
   - cd /opt/ansible-project
-  - ansible-playbook -i inventory/hosts.ini playbooks/setup.yml
+  - ansible-playbook -i localhost, playbooks/setup.yml
