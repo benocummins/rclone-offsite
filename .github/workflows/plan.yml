@@ -39,9 +39,9 @@ jobs:
     - name: Send Discord notification
       if: always()  # ensures this runs even if the plan fails
       run: |
-        STATUS="✅ Terraform plan completed successfully!"
+        STATUS="✅📃 Terraform Plan (Dry Run) completed successfully!"
         if [ ${{ job.status }} != 'success' ]; then
-          STATUS="❌ Terraform plan failed!"
+          STATUS="❌📃 Terraform Plan (Dry Run) failed!"
         fi
 
         curl -H "Content-Type: application/json" \

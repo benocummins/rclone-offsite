@@ -34,3 +34,16 @@ jobs:
           -var="tenant_id=${{ secrets.ARM_TENANT_ID }}" \
           -var="my_ip=${{ secrets.MY_IP }}" \
           -var="rsa_public_key=${{ secrets.RSA_PUBLIC_KEY }}"
+
+    - name: Send Discord notification
+      if: always()  # ensures this runs even if the plan fails
+      run: |
+        STATUS="✅🏗️ Terraform Deploy completed successfully!"
+        if [ ${{ job.status }} != 'success' ]; then
+          STATUS="❌🏗️ Terraform Deploy failed!"
+        fi
+
+        curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{\"content\": \"${STATUS}\"}" \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
