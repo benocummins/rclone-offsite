@@ -1,6 +1,9 @@
 provider "azurerm" {
     features{}
-    subscription_id                 = "7e2e2694-f97c-43f5-a145-f18c7823cbce"
+    subscription_id                 = var.subscription_id
+    client_id                       = var.client_id
+    client_secret                   = var.client_secret
+    tenant_id                       = var.tenant_id
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -91,7 +94,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
     admin_ssh_key {
         username              = "rcloneoffsiteadmin"
-        public_key                  = file("C:/Users/jamie/.ssh/id_rsa.pub")
+        public_key            = var.public_ssh_key 
     }
 
     os_disk {
@@ -107,9 +110,4 @@ resource "azurerm_linux_virtual_machine" "vm" {
     }
     
     custom_data = filebase64("${path.module}/cloud-init.yaml")
-}
-
-output "vm_public_ip" {
-    value                           = azurerm_public_ip.public_ip.ip_address
-    description                     = "The public IP address of the VM"
 }
