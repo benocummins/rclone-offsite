@@ -36,7 +36,7 @@ jobs:
       run: |
         STATUS="✅💣 Terraform Destroy completed successfully!"
         if [ ${{ job.status }} != 'success' ]; then
-          STATUS="❌ Terraform Plan (Dry Run) failed!"
+          STATUS="❌💣 Terraform Destroy failed!"
         fi
 
         curl -H "Content-Type: application/json" \
