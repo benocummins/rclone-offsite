@@ -1,0 +1,6 @@
+subscription_id = "your-subscription-id"
+client_id       = "your-client-id"
+client_secret   = "your-client-secret"
+tenant_id       = "your-tenant-id"
+my_ip           = "1.2.3.4/32"
+rsa_public_key  = "ssh-rsa AAAAB3... comment"
