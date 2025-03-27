@@ -28,4 +28,4 @@ jobs:
           -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
           -var="tenant_id=${{ secrets.ARM_TENANT_ID }}" \
           -var="my_ip=${{ secrets.MY_IP }}" \
-          -var="public_ssh_key='${{ secrets.PUBLIC_SSH_KEY }}'"
+          -var="public_ssh_key='${{ secrets.RSA_PUBLIC_KEY }}'"

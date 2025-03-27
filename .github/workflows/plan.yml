@@ -1,10 +1,10 @@
-name: Terraform Deploy to Azure
+name: Terraform Plan (Dry Run)
 
 on:
-  workflow_dispatch: # manual trigger only
+  workflow_dispatch:  # manual trigger
 
 jobs:
-  deploy:
+  plan:
     runs-on: ubuntu-latest
 
     env:
@@ -23,9 +23,9 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    - name: Terraform Apply
+    - name: Terraform Plan
       run: |
-        terraform apply -auto-approve \
+        terraform plan \
           -var="subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" \
           -var="client_id=${{ secrets.ARM_CLIENT_ID }}" \
           -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
