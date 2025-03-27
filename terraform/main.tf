@@ -94,7 +94,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
 
     admin_ssh_key {
         username              = "rcloneoffsiteadmin"
-        public_key            = var.public_ssh_key 
+        public_key            = var.rsa_public_key 
     }
 
     os_disk {
