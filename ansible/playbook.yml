@@ -1,0 +1,37 @@
+---
+- name: Setup rclone and mount encrypted B2 bucket
+  hosts: all
+  become: true
+  vars:
+    rclone_config_path: "/home/ubuntu/rclone.conf" # Update 'ubuntu' to match your remote user if different
+  
+  
+  tasks:
+    - name: Install dependencies
+      apt:
+        name:
+          - fuse
+          - curl
+        state: present
+        update_cache: true
+
+    - name: Download rclone
+      get_url:
+        url: https://downloads.rclone.org/rclone-current-linux-amd64.deb
+        dest: /tmp/rclone.deb
+
+    - name: Install rclone from .deb
+      apt:
+        deb: /tmp/rclone.deb
+
+    - name: Move rclone.conf to root config folder
+      copy:
+        src: "{{ rclone_conf_path }}"
+        dest: /root/.config/rclone/rclone.conf
+        remote_src: yes
+        mode: '0600'
+
+    - name: Mount ecrypted remote 
+      command: rclone mount b2-crypt: /mnt/b2-crypt --daemon #replace 'b2-crypt' with the remote name from your rclone.conf
+      args:
+        creates: /mnt/b2-crypt

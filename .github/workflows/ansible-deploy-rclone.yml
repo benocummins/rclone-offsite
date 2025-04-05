@@ -1,0 +1,24 @@
+name: Ansible - Deploy Rclone
+
+on:
+  workflow_dispatch: # Trigger manually
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        users: actions/checkout@v3
+
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get install -y ansible sshpass
+
+      - name: Write rclone.conf from GitHub Secret
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONFIG}}" > ~/.config/rclone/rclone.conf
+          chmod 600 ~/.config/rclone/rclone.conf
+
+      - name: Copy rclone.conf to remote server
+        run: |
+          sshpass -p "${{ secrets.}}"
