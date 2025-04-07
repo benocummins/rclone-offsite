@@ -1,6 +1,7 @@
 name: Terraform Plan (Dry Run)
 
 on:
+  workflow_dispatch: # Triger manually
   push:
     branches: [ main ]
 
