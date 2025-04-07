@@ -29,7 +29,8 @@ jobs:
           -var="client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
           -var="tenant_id=${{ secrets.ARM_TENANT_ID }}" \
           -var="my_ip=${{ secrets.MY_IP }}" \
-          -var="rsa_public_key=${{ secrets.RSA_PUBLIC_KEY }}"
+          -var="rsa_public_key=${{ secrets.RSA_PUBLIC_KEY }}" \
+          -var="admin_username=${{ secrets.ADMIN_USERNAME }}"
 
     - name: Send Discord notification
       if: always()  # ensures this runs even if the plan fails
