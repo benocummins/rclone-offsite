@@ -3,6 +3,11 @@ variable "my_ip" {
   type        = string
 }
 
+variable "admin_username" {
+  description = "The admin username of the server"
+  type        = string
+}
+
 variable "rsa_public_key" {
   description = "The SSH public key to install on the VM"
   type        = string
