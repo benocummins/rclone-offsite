@@ -10,10 +10,11 @@ jobs:
       - name: Checkout repo #Get our code
         uses: actions/checkout@v4 # Official GitHub action to clone repo
 
-      - name: Download Inventory File
-        uses: actions/download-artifact@v4
+      - name: Download Inventory File Artifact from Previous Workflow 
+        uses: dawidd6/action-download-artifact@v2 # This action allows us to download artifacts from previous workflows without needing a PAT
         with:
-          name: ansible-inventory
+          workflow: terraform-deploy.yml # Name of the workflow to download from
+          name: ansible-inventory # Name of the artifact to download
           path: ./
 
       - name: Install Ansible # prepare environment
