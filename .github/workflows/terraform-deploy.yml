@@ -37,6 +37,7 @@ jobs:
           -var="admin_username=${{ secrets.ADMIN_USERNAME }}"
 
     - name: Generate Ansible Inventory
+      working-directory: ./terraform
       run: |
         echo "[azure_vm]
         azure ansible_host=$(terraform output -raw vm_public_ip) \
