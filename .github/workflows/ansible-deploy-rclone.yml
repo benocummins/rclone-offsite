@@ -10,9 +10,9 @@ jobs:
       - name: Checkout repo #Get our code
         uses: actions/checkout@v3 # Official GitHub action to clone repo
 
-      -name: Download Inventory File
-       uses: action/download-artifact@v4
-       with:
+      - name: Download Inventory File
+       uses: actions/download-artifact@v3
+        with:
           name: ansible-inventory
           path: ./
 
