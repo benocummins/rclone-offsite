@@ -7,19 +7,30 @@ jobs:
   deploy: # Define a job named 'deploy'
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
-      - name: Checkout repo # Step 1: Get our code
+      - name: Checkout repo #Get our code
         uses: actions/checkout@v3 # Official GitHub action to clone repo
 
-      - name: Install Ansible # Step 2: Prepare environment
+      -name: Download Inventory File
+       uses: action/download-artifact@v4
+       with:
+          name: ansible-inventory
+          path: ./
+
+      - name: Install Ansible # prepare environment
         run: sudo apt-get update && sudo apt-get install -y ansible sshpass # Install required
 
-      - name: Write rclone.conf from GitHub Secret # Step 3: Configure rclone
+      - name: Setup SSH for Ansible
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RSA_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Write rclone.conf from GitHub Secret # Configure rclone
         run: | # Multi-line command block
           mkdir -p ~/.config/rclone
           echo "${{ secrets.RCLONE_CONFIG}}" > ~/.config/rclone/rclone.conf
           chmod 600 ~/.config/rclone/rclone.conf
 
-      - name: Run Deploy Rclone Playbook # Step 4: Execute Ansible Playbook
+      - name: Run Deploy Rclone Playbook # Execute Ansible Playbook
         run: |
-          echo "${{ github.event.client_payload.inventory }}" > inventory.ini
           ansible-playbook -i inventory.ini ./ansible/deploy-rclone-playbook.yml
