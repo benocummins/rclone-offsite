@@ -45,7 +45,7 @@ jobs:
              ansible_user=$(terraform output -raw admin_username) \
              ansible_ssh_private_key_file=~/.ssh/id_rsa" > inventory.ini
     
-    - name: Upload Inventory File (that shit)
+    - name: Upload Inventory File
       uses: actions/upload-artifact@v3
       with:
         name: ansible-inventory
