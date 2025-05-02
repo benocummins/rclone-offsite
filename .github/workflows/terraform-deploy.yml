@@ -24,13 +24,6 @@ jobs:
       working-directory: ./terraform
       run: terraform init
 
-    - name: debugging... remove later...
-      run: |
-        echo "Public key format being used:"
-        echo "${{ secrets.RSA_PUBLIC_KEY }}" | head -n1
-        echo "Admin username being used:"
-        echo "${{ secrets.ADMIN_USERNAME }}"
-
     - name: Terraform Apply
       working-directory: ./terraform
       run: |
@@ -48,13 +41,6 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.RSA_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-
-    - name: Test SSH Connection
-      working-directory: ./terraform
-      run: |
-        IP_ADDRESS=$(terraform output -raw vm_public_ip)
-        USER=$(terraform output -raw admin_username)
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${USER}@${IP_ADDRESS} "echo 'SSH connection successful!'"
 
     - name: Generate Ansible Inventory
       working-directory: ./terraform
