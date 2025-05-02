@@ -38,12 +38,29 @@ jobs:
           -var="rsa_public_key=${{ secrets.RSA_PUBLIC_KEY }}" \
           -var="admin_username=${{ secrets.ADMIN_USERNAME }}"
 
+    - name: Generate Ansible Inventory
+      run: |
+        echo "[azure_vm]
+        azure ansible_host=$(terraform output -raw vm_public_ip) \
+             ansible_user=$(terraform output -raw admin_username) \
+             ansible_ssh_private_key_file=~/.ssh/id_rsa" > inventory.tmp
+
+        echo "ANSIBLE_INVENTORY=$(cat inventory.tmp)" >> $GITHUB_ENV
+
+    - name: Trigger Ansible Workflow
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        event-type: terraform-complete
+        client-playload: '{"inventory": "${{ env.ANSIBLE_INVENTORY }}"}'
+
     - name: Send Discord notification
       if: always()  # ensures this runs even if the plan fails
       run: |
-        STATUS="✅📃 Terraform Plan (Dry Run) completed successfully!"
-        if [ ${{ job.status }} != 'success' ]; then
-          STATUS="❌📃 Terraform Plan (Dry Run) failed!"
+        if [ ${{ job.status }} == 'success' ]; then
+          IP_ADDRESS=$(terraform output -raw vm_public_ip)
+          STATUS="✅🏗️ Terraform Deploy completed successfully at \nVM Public IP: ${IP_ADDRESS}"
+        else
+          STATUS="❌🏗️ Terraform Deploy failed!"
         fi
 
         curl -H "Content-Type: application/json" \

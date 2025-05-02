@@ -1,0 +1,27 @@
+- hosts: azure_vm # Target host/group from ansible inventory file
+  become: true # Run all tasks with sudo privileges - could be set on a task level if needed
+  tasks:
+    - name: Install Rclone
+      apt: # Use apt package manager (Ubuntu/Debian)
+        name: rclone
+        state: present
+
+    - name: Copy rclone.cong to remote server
+      copy: # Ansible's copy module to transfer files
+        src: ~/.config/rclone/rclone.conf #Source: GitHub Actions runner
+        dest: /root/.config/rclone/rclone.conf # Destination: Azure VM
+        owner: root # Set file ownership to root
+        mode: '0600' # Set secure file permissions (owner read/write only)
+
+    - name: Install GUI and RDP Server
+      apt:
+        name: # Install multiple packages
+          - ubuntu-desktop # Full Ubuntu GUI environment
+          - xrdp # Remote Desktop Protocol server
+        state: present
+
+    - name: Enable and start xrpd service
+      systemd: # Manage systemd services 
+        name: xrdp
+        enabled: true # Start on boot
+        state: started # Ensure service is running now

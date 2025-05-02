@@ -1,24 +1,26 @@
-name: Ansible Deploy Rclone
+name: Ansible Deploy Rclone # Name shown in GitHub Actions UI
 
 on:
-  workflow_dispatch: # Trigger manually
+  repository_dispatch: # Triggered by a repository dispatch event
+    types: [terraform-complete] # Only respond to this specific event type
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  deploy: # Define a job named 'deploy'
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
     steps:
-      - name: Checkout repo
-        users: actions/checkout@v3
+      - name: Checkout repo # Step 1: Get our code
+        uses: actions/checkout@v3 # Official GitHub action to clone repo
 
-      - name: Install Ansible
-        run: sudo apt-get update && sudo apt-get install -y ansible sshpass
+      - name: Install Ansible # Step 2: Prepare environment
+        run: sudo apt-get update && sudo apt-get install -y ansible sshpass # Install required
 
-      - name: Write rclone.conf from GitHub Secret
-        run: |
+      - name: Write rclone.conf from GitHub Secret # Step 3: Configure rclone
+        run: | # Multi-line command block
           mkdir -p ~/.config/rclone
           echo "${{ secrets.RCLONE_CONFIG}}" > ~/.config/rclone/rclone.conf
           chmod 600 ~/.config/rclone/rclone.conf
 
-      - name: Copy rclone.conf to remote server
+      - name: Run Deploy Rclone Playbook # Step 4: Execute Ansible Playbook
         run: |
-          sshpass -p "${{ secrets.}}"
+          echo "${{ github.event.client_payload.inventory }}" > inventory.ini
+          ansible-playbook -i inventory.ini ./ansible/deploy-rclone-playbook.yml
