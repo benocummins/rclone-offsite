@@ -44,9 +44,9 @@ jobs:
         azure ansible_host=$(terraform output -raw vm_public_ip) \
              ansible_user=$(terraform output -raw admin_username) \
              ansible_ssh_private_key_file=~/.ssh/id_rsa" > inventory.ini
-    
+
     - name: Upload Inventory File
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ansible-inventory
         path: ./terraform/inventory.ini
