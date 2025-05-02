@@ -54,7 +54,7 @@ jobs:
 
     - name: Send Discord notification
       if: always()  # ensures this runs even if the plan fails
-      working-directory: ./terrform
+      working-directory: ./terraform
       run: |
         if [ ${{ job.status }} == 'success' ]; then
           IP_ADDRESS=$(terraform output -raw vm_public_ip)
