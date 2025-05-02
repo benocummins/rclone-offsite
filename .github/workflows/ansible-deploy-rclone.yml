@@ -1,8 +1,7 @@
 name: Ansible Deploy Rclone # Name shown in GitHub Actions UI
 
 on:
-  repository_dispatch: # Triggered by a repository dispatch event
-    types: [terraform-complete] # Only respond to this specific event type
+  workflow_dispatch: # manual trigger only
 
 jobs:
   deploy: # Define a job named 'deploy'
