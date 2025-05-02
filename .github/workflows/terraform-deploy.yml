@@ -46,7 +46,7 @@ jobs:
              ansible_ssh_private_key_file=~/.ssh/id_rsa" > inventory.ini
     
     - name: Upload Inventory File (that shit)
-      uses: action/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: ansible-inventory
         path: ./terraform/inventory.ini
