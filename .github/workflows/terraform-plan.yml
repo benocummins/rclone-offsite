@@ -42,9 +42,9 @@ jobs:
       if: always()  # ensures this runs even if the plan fails
       run: |
         if [ ${{ job.status }} == 'success' ]; then
-          STATUS="✅🏗️ Terraform Deploy completed successfully!"
+          STATUS="✅🏗️ Terraform Plan (Dry Run) completed successfully!"
         else
-          STATUS="❌🏗️ Terraform Deploy failed!"
+          STATUS="❌🏗️ Terraform Plan (Dry Run) failed!"
         fi
 
         curl -H "Content-Type: application/json" \

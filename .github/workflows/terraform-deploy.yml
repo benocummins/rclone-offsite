@@ -39,25 +39,26 @@ jobs:
     - name: Generate Ansible Inventory
       working-directory: ./terraform
       run: |
+        # Create inventory file
         echo "[azure_vm]
         azure ansible_host=$(terraform output -raw vm_public_ip) \
              ansible_user=$(terraform output -raw admin_username) \
-             ansible_ssh_private_key_file=~/.ssh/id_rsa" > inventory.tmp
-
-        echo "ANSIBLE_INVENTORY=$(cat inventory.tmp)" >> $GITHUB_ENV
-
-    - name: Trigger Ansible Workflow
-      uses: peter-evans/repository-dispatch@v2
+             ansible_ssh_private_key_file=~/.ssh/id_rsa" > inventory.ini
+    
+    - name: Upload Inventory File (that shit)
+      uses: action/upload-artifact@v3
       with:
-        event-type: terraform-complete
-        client-playload: '{"inventory": "${{ env.ANSIBLE_INVENTORY }}"}'
+        name: ansible-inventory
+        path: ./terraform/inventory.ini
+        retention-days: 1
 
     - name: Send Discord notification
       if: always()  # ensures this runs even if the plan fails
+      working-directory: ./terrform
       run: |
         if [ ${{ job.status }} == 'success' ]; then
           IP_ADDRESS=$(terraform output -raw vm_public_ip)
-          STATUS="✅🏗️ Terraform Deploy completed successfully at \nVM Public IP: ${IP_ADDRESS}"
+          STATUS="✅🏗️ Terraform Deploy completed successfully!\nVM Public IP: ${IP_ADDRESS}\n\nAnsible deployment starting..."
         else
           STATUS="❌🏗️ Terraform Deploy failed!"
         fi
