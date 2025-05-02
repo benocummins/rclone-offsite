@@ -3,7 +3,7 @@ output "vm_public_ip" {
     description = "The public IP address of the VM"
 }
 
-ouput "admin_username" {
+output "admin_username" {
     value       = var.admin_username
     description = "The administrator username for the VM"
     sensitive   = false
