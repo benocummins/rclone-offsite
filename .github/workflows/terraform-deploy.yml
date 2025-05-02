@@ -36,6 +36,19 @@ jobs:
           -var="rsa_public_key=${{ secrets.RSA_PUBLIC_KEY }}" \
           -var="admin_username=${{ secrets.ADMIN_USERNAME }}"
 
+    - name: Setup SSH for Ansible
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.RSA_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Test SSH Connection Bitch
+      working-directory: ./terraform
+      run: |
+        IP_ADDRESS=$(terraform output -raw vm_public_ip)
+        USER=$(terraform output -raw admin_username)
+        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${USER}@${IP_ADDRESS} "echo 'SSH connection successful!'"
+
     - name: Generate Ansible Inventory
       working-directory: ./terraform
       run: |
