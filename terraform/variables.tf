@@ -8,6 +8,11 @@ variable "admin_username" {
   type        = string
 }
 
+variable "admin_password" {
+  description = "The admin password of the server"
+  type        = string
+}
+
 variable "rsa_public_key" {
   description = "The SSH public key to install on the VM"
   type        = string
