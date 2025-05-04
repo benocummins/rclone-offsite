@@ -34,13 +34,8 @@ jobs:
           -var="tenant_id=${{ secrets.ARM_TENANT_ID }}" \
           -var="my_ip=${{ secrets.MY_IP }}" \
           -var="rsa_public_key=${{ secrets.RSA_PUBLIC_KEY }}" \
-          -var="admin_username=${{ secrets.ADMIN_USERNAME }}"
-
-    - name: Setup SSH for Ansible
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.RSA_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+          -var="admin_username=${{ secrets.ADMIN_USERNAME }}" \
+          -var="admin_password=${{ secrets.ADMIN_PASSWORD }}"
 
     - name: Generate Ansible Inventory
       working-directory: ./terraform

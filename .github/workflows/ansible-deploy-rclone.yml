@@ -3,6 +3,10 @@ name: Ansible Deploy Rclone # Name shown in GitHub Actions UI
 on:
   workflow_dispatch: # manual trigger only
 
+permissions:
+  actions: read # Needed to read artifacts
+  contents: read # Needed to checkout code
+
 jobs:
   deploy: # Define a job named 'deploy'
     runs-on: ubuntu-latest # Use the latest Ubuntu runner
@@ -10,11 +14,13 @@ jobs:
       - name: Checkout repo #Get our code
         uses: actions/checkout@v4 # Official GitHub action to clone repo
 
-      - name: Download Inventory File
-        uses: actions/download-artifact@v4
+      - name: Download Inventory File Artifact from Previous Workflow 
+        uses: dawidd6/action-download-artifact@v2 # This action allows us to download artifacts from previous workflows without needing a PAT
         with:
-          name: ansible-inventory
+          workflow: terraform-deploy.yml # Name of the workflow to download from
+          name: ansible-inventory # Name of the artifact to download
           path: ./
+          workflow_conclusion: success # Only download if the previous workflow was successful
 
       - name: Install Ansible # prepare environment
         run: sudo apt-get update && sudo apt-get install -y ansible sshpass # Install required
@@ -24,6 +30,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.RSA_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          # Add SSH configuration to disable host key checking
+          echo "Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile=/dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
 
       - name: Write rclone.conf from GitHub Secret # Configure rclone
         run: | # Multi-line command block

@@ -1,27 +1,89 @@
-- hosts: azure_vm # Target host/group from ansible inventory file
-  become: true # Run all tasks with sudo privileges - could be set on a task level if needed
+---
+- hosts: azure_vm
+  become: true
   tasks:
-    - name: Install Rclone
-      apt: # Use apt package manager (Ubuntu/Debian)
-        name: rclone
-        state: present
-
-    - name: Copy rclone.cong to remote server
-      copy: # Ansible's copy module to transfer files
-        src: ~/.config/rclone/rclone.conf #Source: GitHub Actions runner
-        dest: /root/.config/rclone/rclone.conf # Destination: Azure VM
-        owner: root # Set file ownership to root
-        mode: '0600' # Set secure file permissions (owner read/write only)
-
-    - name: Install GUI and RDP Server
+    - name: Update apt cache
       apt:
-        name: # Install multiple packages
-          - ubuntu-desktop # Full Ubuntu GUI environment
-          - xrdp # Remote Desktop Protocol server
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
+    - name: Install XFCE4, RDP Server and FUSE
+      apt:
+        name:
+          - xfce4
+          - xfce4-terminal
+          - xrdp
+          - fuse
+          - fuse3
         state: present
 
-    - name: Enable and start xrpd service
-      systemd: # Manage systemd services 
+    - name: Configure XRDP to use XFCE4
+      copy:
+        dest: /etc/xrdp/startwm.sh
+        content: |
+          #!/bin/sh
+          # xrdp X session start script
+          export DESKTOP_SESSION=xfce
+          exec startxfce4
+        mode: '0755'
+
+    - name: Enable and start xrdp service
+      systemd:
         name: xrdp
-        enabled: true # Start on boot
-        state: started # Ensure service is running now
+        enabled: true
+        state: started
+
+    - name: Add Rclone Repository and Install Rclone
+      shell: |
+        curl -fsSL https://rclone.org/install.sh | sudo bash
+      args:
+        creates: /usr/bin/rclone
+
+    - name: Ensure rclone config directory exists
+      file: 
+        path: "/home/{{ ansible_user }}/.config/rclone"
+        state: directory
+        mode: '0700'
+        owner: "{{ ansible_user }}"
+
+    - name: Copy rclone config to remote server
+      copy:
+        src: "~/.config/rclone/rclone.conf"
+        dest: "/home/{{ ansible_user }}/.config/rclone/rclone.conf"
+        mode: '0600'
+        owner: "{{ ansible_user }}"
+
+    - name: Create rclone mount directory
+      file:
+        path: "/home/{{ ansible_user }}/rclone_mount"
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+
+    - name: Create systemd service for rclone mount
+      copy:
+        dest: /etc/systemd/system/rclone-mount.services
+        content: |
+          [Unit]
+          Description=Rclone Mount Service
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=simple
+          User={{ ansible_user }}
+          ExecStart=/usr/bin/rclone mount b2-crypt: /home/{{ ansible_user }}/rclone-mount --vfs-cache-mode
+          Restart=on-failure
+          RestartSec=30
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: '0644'
+
+    - name: Enable and start rclone mount service
+      systemd:
+        name: rclone-mount
+        daemon_reload: yes
+        enabled: true
+        state: started
