@@ -30,6 +30,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.RSA_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          # Add SSH configuration to disable host key checking
+          echo "Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile=/dev/null" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
 
       - name: Write rclone.conf from GitHub Secret # Configure rclone
         run: | # Multi-line command block
