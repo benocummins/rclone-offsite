@@ -1,17 +1,25 @@
 - hosts: azure_vm # Target host/group from ansible inventory file
   become: true # Run all tasks with sudo privileges - could be set on a task level if needed
   tasks:
-    - name: Install Rclone
-      apt: # Use apt package manager (Ubuntu/Debian)
-        name: rclone
-        state: present
+    - name: Add Rclone Repository
+      shell: |
+        cur -fsSl https://rclone.org/install.sh | sudo bash # Download and run the rclone install script
+      args:
+        creates: /usr/bin/rclone
+
+    - name: Ensure rclone config directory exists
+      file: 
+        path: "/home/{{ ansible_user }}/.config/rclone" # Path to rclone config directory
+        state: directory # Ensure the directory exists
+        mode: '0700' # Set secure permissions (owner read/write/execute only)
+        owner: "{{ ansible_user }}" # Set ownership to the ansible user
 
     - name: Copy rclone.cong to remote server
       copy: # Ansible's copy module to transfer files
         src: ~/.config/rclone/rclone.conf #Source: GitHub Actions runner
-        dest: /root/.config/rclone/rclone.conf # Destination: Azure VM
-        owner: root # Set file ownership to root
+        dest: "home/{{ ansible_user }}/.config/rclone/rclone.conf # Destination: Azure VM
         mode: '0600' # Set secure file permissions (owner read/write only)
+        owner: "{{ ansible_user }}" # Set ownership to the ansible user
 
     - name: Install GUI and RDP Server
       apt:
