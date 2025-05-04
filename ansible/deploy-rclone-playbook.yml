@@ -22,6 +22,12 @@
         mode: '0600'
         owner: "{{ ansible_user }}"
 
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
     - name: Install GUI and RDP Server
       apt:
         name:
