@@ -1,35 +1,36 @@
-- hosts: azure_vm # Target host/group from ansible inventory file
-  become: true # Run all tasks with sudo privileges - could be set on a task level if needed
+---
+- hosts: azure_vm
+  become: true
   tasks:
     - name: Add Rclone Repository
       shell: |
-        cur -fsSl https://rclone.org/install.sh | sudo bash # Download and run the rclone install script
+        curl -fsSL https://rclone.org/install.sh | sudo bash
       args:
         creates: /usr/bin/rclone
 
     - name: Ensure rclone config directory exists
       file: 
-        path: "/home/{{ ansible_user }}/.config/rclone" # Path to rclone config directory
-        state: directory # Ensure the directory exists
-        mode: '0700' # Set secure permissions (owner read/write/execute only)
-        owner: "{{ ansible_user }}" # Set ownership to the ansible user
+        path: "/home/{{ ansible_user }}/.config/rclone"
+        state: directory
+        mode: '0700'
+        owner: "{{ ansible_user }}"
 
-    - name: Copy rclone.cong to remote server
-      copy: # Ansible's copy module to transfer files
-        src: ~/.config/rclone/rclone.conf #Source: GitHub Actions runner
-        dest: "home/{{ ansible_user }}/.config/rclone/rclone.conf # Destination: Azure VM
-        mode: '0600' # Set secure file permissions (owner read/write only)
-        owner: "{{ ansible_user }}" # Set ownership to the ansible user
+    - name: Copy rclone config to remote server
+      copy:
+        src: "~/.config/rclone/rclone.conf"
+        dest: "/home/{{ ansible_user }}/.config/rclone/rclone.conf"
+        mode: '0600'
+        owner: "{{ ansible_user }}"
 
     - name: Install GUI and RDP Server
       apt:
-        name: # Install multiple packages
-          - ubuntu-desktop # Full Ubuntu GUI environment
-          - xrdp # Remote Desktop Protocol server
+        name:
+          - ubuntu-desktop
+          - xrdp
         state: present
 
-    - name: Enable and start xrpd service
-      systemd: # Manage systemd services 
+    - name: Enable and start xrdp service
+      systemd:
         name: xrdp
-        enabled: true # Start on boot
-        state: started # Ensure service is running now
+        enabled: true
+        state: started
