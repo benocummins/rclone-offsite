@@ -59,7 +59,7 @@ resource "azurerm_network_security_group" "nsg" {
         protocol                    = "Tcp"
         source_port_range           = "*"
         destination_port_range      = "22"
-        source_address_prefix       = var.my_ip
+        source_address_prefix       = [var.my_ip, "20.29.0.0/16"] # Include GitHub Actions IP range
         destination_address_prefix  = "*"
     }
 
